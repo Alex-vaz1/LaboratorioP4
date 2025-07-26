@@ -1,25 +1,25 @@
-CC=gcc
-CFLAGS=-c -Wall -Wextra -std=c++11
-LDFLAGS = -lstdc++
-INCLUDES=-Iinclude
-SRCDIR=src
-OBJDIR=obj
+CC = g++
+CFLAGS = -Wall -Wextra -std=c++11 -Iinclude -g
+SRCDIR = src
+OBJDIR = obj
+BINDIR = bin
+EXECUTABLE = $(BINDIR)/principal
 
-SOURCES=$(wildcard $(SRCDIR)/*.cpp)
-OBJECTS=$(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
-MAINOBJ=$(OBJDIR)/principal.o
-EXECUTABLE=principal
+SOURCES = $(wildcard $(SRCDIR)/*.cpp)
+OBJECTS = $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SOURCES))
+MAINOBJ = $(OBJDIR)/principal.o
 
-all: $(SOURCES) $(EXECUTABLE)
-
-$(EXECUTABLE): $(OBJECTS) $(MAINOBJ)
-	$(CC) $(LDFLAGS) $^ -o $@
-
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
-
-$(MAINOBJ): principal.cpp
-	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
-
+all: $(EXECUTABLE)
+$(EXECUTABLE): $(OBJECTS) $(MAINOBJ) | $(BINDIR)
+	$(CC) $^ -o $@
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+$(MAINOBJ): principal.cpp | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
+$(BINDIR):
+	mkdir -p $(BINDIR)
 clean:
-	rm -f $(OBJDIR)/*.o $(EXECUTABLE)
+	rm -rf $(OBJDIR)/*.o $(EXECUTABLE)
+
